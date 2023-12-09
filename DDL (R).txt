@@ -1,0 +1,75 @@
+CREATE TABLE User (
+    userId INT PRIMARY KEY AUTO_INCREMENT,
+    firstName VARCHAR(100) NOT NULL,
+    lastName VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    locationID INT,
+    gender VARCHAR(10) NOT NULL,
+    phoneNum VARCHAR(15) NOT NULL,
+    regDate DATE NOT NULL,
+    age INT NOT NULL,
+	FOREIGN KEY (locationID) REFERENCES location(locationID)
+);
+CREATE TABLE Location (
+ locationId INT PRIMARY KEY,
+ locationName VARCHAR(255) NOT NULL
+);
+CREATE TABLE Student (
+    studentId INT PRIMARY KEY,
+    educationalStatus VARCHAR(20),  -- Alvl/Olvl/inter/Matric/None
+    currentClass VARCHAR(20) NOT NULL, -- class(KG--A2)/None
+    bio TEXT,
+    FOREIGN KEY (studentID) REFERENCES User(UserID) ON DELETE CASCADE
+);
+CREATE TABLE Teacher (
+    teacherID INT PRIMARY KEY,
+    qualification TEXT,  
+    expectedFees Decimal,
+    bio TEXT,
+	status Varchar(10) DEFAULT 'AVL' CHECK (status IN ('AVL', 'NAVL')) , -- AVL:available 	NAVL:not available
+    FOREIGN KEY (teacherId) REFERENCES User(userId) ON DELETE CASCADE
+);
+CREATE TABLE Subject (
+    subjectID INT PRIMARY KEY,
+    subjectName VARCHAR(255) NOT NULL
+);
+CREATE TABLE Teacher_Subject_Expertise (
+    teacherId INT ,
+	subjectId INT ,
+    primary key(teacherId,subjectId),
+	FOREIGN KEY (subjectId) REFERENCES subject(subjectId) ON DELETE CASCADE,
+	FOREIGN KEY (teacherId) REFERENCES teacher(teacherId) ON DELETE CASCADE
+);
+CREATE TABLE Student_Subject_Requirement (
+    studentID INT ,
+	subjectID INT ,
+    primary key(studentId,subjectId),
+	FOREIGN KEY (subjectId) REFERENCES subject(subjectId) ON DELETE CASCADE,
+	FOREIGN KEY (studentId) REFERENCES student(studentId) ON DELETE CASCADE
+);
+CREATE TABLE Demo_Request(
+    studentId INT ,
+	teacherId INT ,
+    demoDate DATE NOT NULL,
+	status Varchar(20) DEFAULT NULL CHECK (status IN ('accept', 'reject')) , 
+    primary key(studentId,teacherId),
+	FOREIGN KEY (teacherId) REFERENCES teacher(teacherId) ON DELETE CASCADE,
+	FOREIGN KEY (studentId) REFERENCES student(studentId) ON DELETE CASCADE
+);
+CREATE TABLE Rating (
+	ratingId INT primary key,
+    studentId INT ,
+	teacherId INT ,
+	ratingValue Decimal,
+    comment varchar(255),
+	FOREIGN KEY (teacherId) REFERENCES teacher(teacherId) ON DELETE CASCADE,
+	FOREIGN KEY (studentId) REFERENCES student(studentId) ON DELETE SET NULL
+);
+CREATE TABLE instructed_students (
+    studentId INT,
+    teacherId INT,
+    PRIMARY KEY (studentId, teacherId),
+    FOREIGN KEY (teacherId) REFERENCES teacher(teacherId) ON DELETE CASCADE,
+    FOREIGN KEY (studentId) REFERENCES student(studentId) ON DELETE CASCADE
+);

@@ -1,0 +1,39 @@
+Stored Procedures :
+
+
+-----------------------------------------------------------------------------------------------------------------------------------
+DELIMITER //
+
+CREATE PROCEDURE getStudentdetails(IN userIdParam INT)
+BEGIN
+    SELECT 
+        U.firstName, U.lastName, U.email, L.locationName,
+        U.gender, U.phoneNum, U.age, S.educationalStatus, S.currentClass, S.bio
+    FROM 
+        User U
+    JOIN 
+        location L ON L.locationid = U.locationid
+    JOIN 
+        student S ON S.studentId = U.userid
+    WHERE 
+        U.userID = userIdParam;
+END //
+
+DELIMITER ;
+
+-----------------------------------------------------------------------------------------------------------------------------------
+DELIMITER //
+
+CREATE PROCEDURE getStudentsubjects(IN studentIdParam INT)
+BEGIN
+    SELECT 
+        S.subjectName
+    FROM 
+        Subject S
+    JOIN 
+        student_subject_requirement SSR ON SSR.subjectID = S.subjectID
+    WHERE 
+        SSR.studentID = studentIdParam;
+END //
+
+DELIMITER ;

@@ -1,0 +1,54 @@
+    EditProfile= async (req,res)=>{
+
+        try {
+            const userID=req.userID
+            // update User Table
+            DB.query(`
+            UPDATE User
+            SET User.locationid = (SELECT locationid FROM location WHERE locationName = ?),
+            User.PhoneNum = ?
+            WHERE userid = ? ;`
+            ,[req.body.locationName,req.body.phoneNum,userID],(err)=>{
+                if(err){
+                    return res.status(500).send("Updation Failed")
+                }
+            });
+
+            // update student table
+            DB.query(`
+            UPDATE student
+            SET educationalStatus = ?, currentClass = ?
+            WHERE studentid = ? ;`
+            ,[req.body.educationalStatus,req.body.currentClass,userID],(err)=>{
+                if(err){
+                    return res.status(500).send("Updation Failed")
+                }
+            });
+
+            // update subject_requirement_table
+            DB.query(`delete from student_subject_requirement where studentid = ?; `,[userID],(err)=>{
+                if(err){
+                    return res.status(500).send("Updation Failed")
+                }
+                else{
+                    const subarray = req.body.selectedSubjects;
+                    subarray.forEach((subject) => {
+                        DB.query(`select subjectID from Subject where subjectname=?`,[subject],(err,data)=>{
+                            DB.query(` INSERT INTO student_subject_requirement (studentID, subjectID) VALUES (?, ?) `, [ userID, data[0].subjectID], (err) => {
+                                if(err){
+                                    console.log(`${subject} not inserted`)
+                                 }
+                            });
+                        })
+                    });
+                }
+            })
+
+
+        } 
+        catch (error) {
+            console.log(error)
+            return res.status(500).send("Updation Failed")
+        }
+
+    }
